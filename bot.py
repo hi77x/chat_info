@@ -1,9 +1,14 @@
+
 import logging
+import redis
+from datetime import datetime
 from telegram import (
     Update,
     KeyboardButton,
     ReplyKeyboardMarkup,
     KeyboardButtonRequestChat,
+    InlineKeyboardButton, 
+    InlineKeyboardMarkup,
     KeyboardButtonRequestUsers
 )
 from telegram.ext import (
@@ -25,11 +30,45 @@ logger = logging.getLogger(__name__)
 # Токен вашего бота (замените на новый токен после его генерации)
 TOKEN = '7828754119:AAH2CD56qHfq4gjcy20v5HOjPRALDhlnprI'  # Обязательно замените на ваш новый токен
 
+# Подключение к Redis
+REDIS_URL = 'redis://default:nBpmtWTyNbcbiJkfDEratHRWzoWUTomE@autorack.proxy.rlwy.net:51766'
+
+try:
+    redis_client = redis.Redis.from_url(REDIS_URL)
+    # Проверка подключения
+    redis_client.ping()
+    logger.info("Успешное подключение к Redis.")
+except Exception as e:
+    logger.error(f"Не удалось подключиться к Redis: {e}")
+    redis_client = None  # В дальнейшем можно обработать отсутствие подключения
+
 # Обработчик команды /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     logger.info(f"Получена команда /start от пользователя {user.id} ({user.username})")
-    
+
+    # Определите статус премиум пользователя (это просто пример)
+    is_premium = user.is_premium if hasattr(user, 'is_premium') else False  # Используйте ваш способ определения статуса
+
+    # Сохранение информации о пользователе в Redis
+    if redis_client:
+        try:
+            user_key = f"user:{user.id}"
+            user_data = {
+                "username": user.username or "",
+                "first_name": user.first_name or "",
+                "last_name": user.last_name or "",
+                "language_code": user.language_code or "",
+                "joined_at": datetime.utcnow().isoformat(),
+                "is_premium": str(is_premium)  # Преобразуем в строку
+            }
+            redis_client.hset(user_key, mapping=user_data)
+            logger.info(f"Информация о пользователе {user.id} сохранена в Redis.")
+        except Exception as e:
+            logger.error(f"Ошибка при сохранении пользователя {user.id} в Redis: {e}")
+    else:
+        logger.warning("Redis клиент не инициализирован. Информация о пользователе не была сохранена.")
+
     keyboard = [
         [
             KeyboardButton(
@@ -64,22 +103,41 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             )
         ]
     ]
-    
+
     reply_markup = ReplyKeyboardMarkup(
         keyboard, resize_keyboard=True, one_time_keyboard=True
     )
-    
+
+    #keyboard = [[InlineKeyboardButton("Посмотреть", url="https://t.me/neztrix")]]
+    #reply_markup = InlineKeyboardMarkup(keyboard)
+
+    premium_status = "Premium: ✅" if is_premium else "Premium: ❌"
+      
+    username = user.username if user.username else None
+
+    if username:
+        user_link = f"[{user.first_name}](tg://user?id={user.id})"
+    else:
+        user_link = user.first_name or "пользователь"
+
     await update.message.reply_text(
-        "Выберите тип для получения ID:",
-        reply_markup=reply_markup
-    )
+    f"Привет, {user_link}!\n\n"
+    f"Твой ID: `{user.id}`\n"
+    f"{premium_status}\n\n"
+    '',
+    reply_markup=reply_markup,
+    parse_mode=ParseMode.MARKDOWN,
+    disable_web_page_preview=True
+)
+
+    
 
 # Обработка выбранных объектов и возврат ID
 async def handle_selection_response(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = update.message
     user = update.effective_user
-    logger.info(f"Получено сообщение от пользователя {user.id} ({user.username}): {message}")
-    
+    logger.info(f"Получено сообщение от пользователя {user.id} ({user.username}): {message.text}")
+
     response = None
     # Обработка выбора чата или канала через chat_shared
     if message.chat_shared:
