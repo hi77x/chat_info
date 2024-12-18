@@ -28,7 +28,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Токен вашего бота (замените на новый токен после его генерации)
-TOKEN = '7828754119:AAH2CD56qHfq4gjcy20v5HOjPRALDhlnprI'  # Обязательно замените на ваш новый токен
+TOKEN = '7993581170:AAFqnpKlD-JK2XRrzlatk5UqXfRz-MI1y9M'  # Обязательно замените на ваш новый токен
 
 # Подключение к Redis
 REDIS_URL = 'redis://default:nBpmtWTyNbcbiJkfDEratHRWzoWUTomE@autorack.proxy.rlwy.net:51766'
@@ -108,10 +108,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         keyboard, resize_keyboard=True, one_time_keyboard=True
     )
 
-    #keyboard = [[InlineKeyboardButton("Посмотреть", url="https://t.me/neztrix")]]
-    #reply_markup = InlineKeyboardMarkup(keyboard)
+    keyboard = [[InlineKeyboardButton("👑Бот делает кружочки", url="https://t.me/circle_votebot")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
-    premium_status = "Premium: ✅" if is_premium else "Premium: ❌"
+    premium_status = "🏆Premium: ✅" if is_premium else "Premium: ❌"
       
     username = user.username if user.username else None
 
