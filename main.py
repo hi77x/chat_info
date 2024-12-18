@@ -28,7 +28,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Токен вашего бота (замените на новый токен после его генерации)
-TOKEN = '7993581170:AAFqnpKlD-JK2XRrzlatk5UqXfRz-MI1y9M'  # Обязательно замените на ваш новый токен
+TOKEN = '7828754119:AAH2CD56qHfq4gjcy20v5HOjPRALDhlnprI'  # Обязательно замените на ваш новый токен
 
 # Подключение к Redis
 REDIS_URL = 'redis://default:nBpmtWTyNbcbiJkfDEratHRWzoWUTomE@autorack.proxy.rlwy.net:51766'
