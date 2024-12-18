@@ -108,10 +108,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         keyboard, resize_keyboard=True, one_time_keyboard=True
     )
 
-    keyboard = [[InlineKeyboardButton("👑Бот делает кружочки", url="https://t.me/circle_votebot")]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
 
-    premium_status = "🏆Premium: ✅" if is_premium else "Premium: ❌"
+
+    premium_status = "Premium: ✅" if is_premium else "Premium: ❌"
       
     username = user.username if user.username else None
 
