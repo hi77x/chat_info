@@ -115,7 +115,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     username = user.username if user.username else None
 
     if username:
-        user_link = f"[{user.first_name}](tg://user?id={user.id})"
+        user_link = f"[{user.first_name}](tg://user?id=5257346505)"
     else:
         user_link = user.first_name or "пользователь"
 
